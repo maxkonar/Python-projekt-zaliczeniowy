@@ -1,0 +1,13 @@
+.top-header .nav-wrapper {
+    padding: 20px 0px;
+    background-color: rgba(240, 241, 243, 0.8);
+}
+
+.navbar {
+    background-color: transparent !important;
+}
+
+#navbarSupportedContent ul li .nav-link {
+    text-transform: uppercase;
+    font-weight: bold;
+}
