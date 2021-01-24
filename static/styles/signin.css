@@ -9,6 +9,18 @@ body {
   padding: 15px;
   margin: 0 auto;
 }
+
+.form-signin label {
+    position: unset;
+    overflow: unset;
+    height: 25px;
+    width: 100px;
+}
+
+.form-signin input {
+    margin-bottom: 15px;
+}
+
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
   margin-bottom: 10px;
