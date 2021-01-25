@@ -74,6 +74,15 @@ def login():
 def signup():
     form = RegisterForm()
 
+    exist_user = User.query.filter_by(username=form.username.data).first()
+    exist_email = User.query.filter_by(email=form.email.data).first()
+
+    if exist_user:
+        flash('Podana nazwa użytkownika jest już zajęta')
+        return render_template('signup.html', form=form)
+    if exist_email:
+        flash('Podany email jest już zajęty')
+        return render_template('signup.html', form=form)
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='sha256')
         new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
@@ -87,8 +96,12 @@ def signup():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html', name=current_user.username)
+    return render_template('dashboard.html', username=current_user.username, email=current_user.email)
 
+@app.route('/covid')
+@login_required
+def covid():
+    return render_template('covid.html')
 
 @app.route('/logout')
 @login_required
