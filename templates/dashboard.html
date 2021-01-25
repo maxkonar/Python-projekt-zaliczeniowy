@@ -10,25 +10,26 @@ Panel użytkownika
         <div class="col-sm-2 sidebar">
           <ul class="nav-sidebar">
             <li class="active"><a href="/dashboard">Profil użytkownika</a></li>
+            <li class="active"><a href="/covid">Formularz covidowy</a></li>
             <li><a href="{{ url_for('logout')}}">Wylogowanie</a></li>
           </ul>
         </div>
         <div class="col-sm-10 main">
-          <h1 class="page-header">Witaj, {{ name }}!</h1>
+          <h1 class="page-header">Witaj, {{ username }}!</h1>
           <div class="content">
             <div class="info-banner">
               <h4>Tutaj znajdziesz informacje na temat swojego profilu.</h4>
             </div>
             <div class="profil-information">
               <div class="row">
-                <div class="col-sm">
-                  One of three columns
-                </div>
-                <div class="col-sm">
-                  One of three columns
-                </div>
-                <div class="col-sm">
-                  One of three columns
+                <div class="col">
+                  <form class = 'user-info'>
+                      <label for="name">Imię: </label>
+                      <label for="surname">Nazwisko: </label>
+                      <label for="adres-email">Email: {{ email }}</label>
+                      <label for="personal-id-number">Pesel: </label>
+                      <label for="phone">Tel. kontaktowy: </label>
+                  </form>
                 </div>
               </div>
             </div>
