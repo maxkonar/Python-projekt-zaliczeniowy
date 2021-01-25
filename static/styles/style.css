@@ -32,3 +32,20 @@ li {
     background-color: rgba(240, 241, 243, 0.8);
     border-right: 2px solid rgba(240, 241, 243, 0.9);
 }
+
+.sidebar ul {
+    padding: 10px 0px;
+}
+
+.sidebar ul li a {
+    text-transform: uppercase;
+    font-weight: bold;
+    color: rgba(0,0,0,.5);
+}
+.info-banner h4 {
+    text-align:center;
+}
+
+.page-header {
+    text-align:center;
+}
