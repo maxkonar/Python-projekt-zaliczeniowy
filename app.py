@@ -5,6 +5,8 @@ from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import InputRequired, Email, Length
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '123456'
@@ -13,13 +15,29 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.permanent_session_lifetime = timedelta(minutes=5)
 Bootstrap(app)
 db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
-class User(db.Model):
-    _id = db.Column(db.Integer, primary_key=True)
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True)
     email = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(80))
+    informations = db.relationship('Information', backref='user')
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+class Information(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(20))
+    surname = db.Column(db.String(30))
+    phone_number = db.Column(db.String(30))
+    email = db.Column(db.String(50))
 
 
 class LoginForm(FlaskForm):
@@ -43,7 +61,8 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user:
-            if user.password == form.password.data:
+            if check_password_hash(user.password, form.password.data):
+                login_user(user, remember=form.remember.data)
                 return redirect('dashboard')
 
         return '<h1> Invalid username or password </h1>'
@@ -56,7 +75,8 @@ def signup():
     form = RegisterForm()
 
     if form.validate_on_submit():
-        new_user = User(username=form.username.data, email=form.email.data, password=form.password.data)
+        hashed_password = generate_password_hash(form.password.data, method='sha256')
+        new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
         return '<h1>' + form.username.data + ' ' + form.email.data + ' ' + form.password.data + '</h1>'
@@ -64,8 +84,16 @@ def signup():
     return render_template('signup.html', form=form)
 
 @app.route('/dashboard')
+@login_required
 def dashboard():
-    return render_template('dashboard.html')
+    return render_template('dashboard.html', name = current_user.username)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return render_template('index.html')
 
 if __name__ == '__main__':
  db.create_all()
