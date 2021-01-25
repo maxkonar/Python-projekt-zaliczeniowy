@@ -6,3 +6,15 @@ function myFunction() {
     x.style.display = "block";
   }
 }
+
+jQuery( document ).ready(function($){
+    if($('label[for=username]').length){
+        $('label[for=username]').text('Nazwa użytkownika');
+    }
+    if($('label[for=email]').length){
+        $('label[for=email]').text('Adres Email');
+    }
+    if($('label[for=password]').length){
+        $('label[for=password]').text('Hasło');
+    }
+});

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect, flash, url_for
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField
@@ -65,7 +65,7 @@ def login():
                 login_user(user, remember=form.remember.data)
                 return redirect('dashboard')
 
-        return '<h1> Invalid username or password </h1>'
+        return render_template('login.html', form=form)
 
     return render_template('login.html', form=form)
 
@@ -79,14 +79,14 @@ def signup():
         new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
-        return '<h1>' + form.username.data + ' ' + form.email.data + ' ' + form.password.data + '</h1>'
+        return redirect(url_for('login'))
 
     return render_template('signup.html', form=form)
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html', name = current_user.username)
+    return render_template('dashboard.html', name=current_user.username)
 
 
 @app.route('/logout')

@@ -6,3 +6,11 @@
     overflow-x: hidden;
     overflow-y: hidden;
 }
+
+.form-signin h2 {
+    padding: 20px 0px;
+}
+
+.form-signin button {
+    margin-bottom: 20px;
+}
