@@ -22,7 +22,7 @@ login_manager.login_view = 'login'
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(15), unique=True)
+    username = db.Column(db.String(25), unique=True)
     email = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(80))
     informations = db.relationship('Information', backref='user')
@@ -41,12 +41,12 @@ class Information(db.Model):
 
 
 class LoginForm(FlaskForm):
-    username = StringField('username', validators=[InputRequired(), Length(min=4, max=15)])
+    username = StringField('username', validators=[InputRequired(), Length(min=4, max=25)])
     password = PasswordField('password', validators=[InputRequired(), Length(min=8, max=50)])
     remember = BooleanField('remember me')
 
 class RegisterForm(FlaskForm):
-    username = StringField('username', validators=[InputRequired(), Length(min=4, max=15)])
+    username = StringField('username', validators=[InputRequired(), Length(min=4, max=25)])
     email = StringField('email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)])
     password = PasswordField('password', validators=[InputRequired(), Length(min=8, max=50)])
 
@@ -79,6 +79,7 @@ def signup():
         new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
+        flash('Konto zostało utworzone! Proszę się zalogować')
         return redirect(url_for('login'))
 
     return render_template('signup.html', form=form)

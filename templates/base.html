@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css"  href="{{url_for('static', filename='styles/footer.css')}}">
     <link rel="stylesheet" type="text/css"  href="{{url_for('static', filename='styles/mobile.css')}}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="icon" type="image/png" sizes="192x192" href="{{url_for('static', filename='images/favicon.jpg')}}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{url_for('static', filename='images/favicon.png')}}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 
@@ -30,7 +30,7 @@
                     <a class="nav-link" href="/">Strona główna<span class="sr-only">(current)</span></a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="#">Formularz covidowy</a>
+                    <a class="nav-link" href="/dashboard">Panel użytkownika</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="/login">Logowanie</a>
@@ -60,6 +60,16 @@
       </div>
     </section>
   </header>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 
 <main class="main">
 {% block content %} {% endblock  %}
