@@ -27,6 +27,13 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(80))
     informations = db.relationship('Information', backref='user')
 
+    def __init__(self, id, username, email, password, informations):
+        self.id = id
+        self.username = username
+        self.email = email
+        self.password = password
+        self.informations = informations
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -38,12 +45,23 @@ class Information(db.Model):
     surname = db.Column(db.String(30))
     personal_id_number = db.Column(db.String(30))
     phone_number = db.Column(db.String(30))
-    email = db.Column(db.String(50))
-    temperature = db.Column(db.Boolean, default=False, nullable=False)
-    medicine = db.Column(db.Boolean, default=False, nullable=False)
-    first_issues = db.Column(db.Boolean, default=False, nullable=False)
-    second_issues = db.Column(db.Boolean, default=False, nullable=False)
-    third_issues = db.Column(db.Boolean, default=False, nullable=False)
+    temperature = db.Column(db.Boolean, default=False)
+    medicine = db.Column(db.Boolean, default=False)
+    first_issues = db.Column(db.Boolean, default=False)
+    second_issues = db.Column(db.Boolean, default=False)
+    third_issues = db.Column(db.Boolean, default=False)
+
+    def __init__(self, id, user_id, name, surname, personal_id_number, temperature, medicine, first_issues, second_issues, third_issues):
+        self.id = id
+        self.user_id = user_id
+        self.name = name
+        self.surname = surname
+        self.personal_id_number = personal_id_number
+        self.temperature = temperature
+        self.medicine = medicine
+        self.first_issues = first_issues
+        self.second_issues = second_issues
+        self.third_issues = third_issues
 
 class LoginForm(FlaskForm):
     username = StringField('username', validators=[InputRequired(), Length(min=4, max=25)])
@@ -59,35 +77,40 @@ class CovidForm(FlaskForm):
     name = StringField('Imię', validators=[InputRequired(), Length(min=4, max=25)])
     surname = StringField('Nazwisko', validators=[InputRequired(), Length(min=1, max=50)])
     personal_id_number = StringField('Pesel', validators=[InputRequired(), Length(min=12, max=20)])
-    phone_number = StringField('Tel.kontaktowy', validators=[InputRequired(), Length(min=12, max=20)])
-    temperature = BooleanField('Gorączka 38 ˚C i powyżej', validators=[InputRequired()])
-    medicine = BooleanField('Czy zażywa Pani/Pan leki obniżające temperaturę?', validators=[InputRequired()])
-    first_issues = BooleanField('Kaszel, biegunka, nudności i wymioty, zaburzenia węchu i smaku', validators=[InputRequired()])
-    second_issues = BooleanField('Trudności z oddychaniem/duszności/ trudności w nabraniu powietrza', validators=[InputRequired()])
-    third_issues = BooleanField('Bóle mięśni/zmęczenie', validators=[InputRequired()])
+    phone_number = StringField('Tel.kontaktowy', validators=[InputRequired(), Length(min=7, max=20)])
+    temperature = BooleanField('Gorączka 38 ˚C i powyżej')
+    medicine = BooleanField('Czy zażywa Pani/Pan leki obniżające temperaturę?')
+    first_issues = BooleanField('Kaszel, biegunka, nudności i wymioty, zaburzenia węchu i smaku')
+    second_issues = BooleanField('Trudności z oddychaniem/duszności/ trudności w nabraniu powietrza')
+    third_issues = BooleanField('Bóle mięśni/zmęczenie')
 
-@app.route('/covid', methods=['GET','POST'])
+@app.route('/covid', methods=['GET', 'POST'])
 @login_required
 def covid():
     form = CovidForm()
 
-    if form.validate_on_submit():
-        new_information = Information(
-            name=form.name.data,
-            surname=form.surname.data,
-            personal_id_number=form.personal_id_number.data,
-            phone_number=form.phone_number.data,
-            temperature=form.temperature.data,
-            medicine=form.medicine.data,
-            first_issues=form.first_issues.data,
-            second_issues=form.second_issues.data,
-            third_issues=form.third_issues.data,
-        )
-        db.session.add(new_information)
-        db.session.commit()
-        flash('Dane zostały zapisane!')
+    if request.method == "POST":
+        if form.validate_on_submit():
+            new_information = Information(
+                user_id=current_user.id,
+                name=form.name.data,
+                surname=form.surname.data,
+                personal_id_number=form.personal_id_number.data,
+                phone_number=form.phone_number.data,
+                temperature=form.temperature.data,
+                medicine=form.medicine.data,
+                first_issues=form.first_issues.data,
+                second_issues=form.second_issues.data,
+                third_issues=form.third_issues.data)
+            flash('Dane zostały zapisane!')
+            db.session.add(new_information)
+            db.session.commit()
+            return render_template('covid.html', form=form)
+        flash('Nie przeszło validate_on_submit!')
+        return render_template('covid.html', form=form)
+    flash(current_user.username)
+    flash(form.validate())
     return render_template('covid.html', form=form)
-
 
 @app.route('/')
 def home():
@@ -103,7 +126,7 @@ def login():
             if check_password_hash(user.password, form.password.data):
                 login_user(user, remember=form.remember.data)
                 return redirect('dashboard')
-
+        flash('Podany użytkownik nie istnieje!')
         return render_template('login.html', form=form)
 
     return render_template('login.html', form=form)
