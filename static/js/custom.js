@@ -18,7 +18,7 @@ jQuery( document ).ready(function($){
         $('label[for=password]').text('Hasło');
     }
     if($('.flashes li').text() == "Please log in to access this page."){
-        $('.flashes li').text("Żeby mieć dostęp do panalu użytkownika należy się zalogować");
+        $('.flashes li').text("Żeby mieć dostęp do panelu użytkownika należy się zalogować");
     }
 
 });
