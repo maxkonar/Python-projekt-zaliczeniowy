@@ -37,10 +37,19 @@
     width:75%;
 }
 
-.user-form .form-group label, .user-form .form-group div{
+.form-covid .form-group label, .form-covid .form-group input{
     display: inline-block;
 }
 
-.radio-inline {
-    margin-right:20px;
+.form-covid .form-group label {
+    width: 20%;
+    margin-right: 40px;
+}
+
+.form-covid .form-group input {
+    width: 74%;
+}
+
+.form-covid .checkbox label input {
+    float: right;
 }
