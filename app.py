@@ -36,9 +36,14 @@ class Information(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(20))
     surname = db.Column(db.String(30))
+    personal_id_number = db.Column(db.String(30))
     phone_number = db.Column(db.String(30))
     email = db.Column(db.String(50))
-
+    temperature = db.Column(db.Boolean, default=False, nullable=False)
+    medicine = db.Column(db.Boolean, default=False, nullable=False)
+    first_issues = db.Column(db.Boolean, default=False, nullable=False)
+    second_issues = db.Column(db.Boolean, default=False, nullable=False)
+    third_issues = db.Column(db.Boolean, default=False, nullable=False)
 
 class LoginForm(FlaskForm):
     username = StringField('username', validators=[InputRequired(), Length(min=4, max=25)])
@@ -49,6 +54,40 @@ class RegisterForm(FlaskForm):
     username = StringField('username', validators=[InputRequired(), Length(min=4, max=25)])
     email = StringField('email', validators=[InputRequired(), Email(message='Invalid email'), Length(max=50)])
     password = PasswordField('password', validators=[InputRequired(), Length(min=8, max=50)])
+
+class CovidForm(FlaskForm):
+    name = StringField('Imię', validators=[InputRequired(), Length(min=4, max=25)])
+    surname = StringField('Nazwisko', validators=[InputRequired(), Length(min=1, max=50)])
+    personal_id_number = StringField('Pesel', validators=[InputRequired(), Length(min=12, max=20)])
+    phone_number = StringField('Tel.kontaktowy', validators=[InputRequired(), Length(min=12, max=20)])
+    temperature = BooleanField('Gorączka 38 ˚C i powyżej', validators=[InputRequired()])
+    medicine = BooleanField('Czy zażywa Pani/Pan leki obniżające temperaturę?', validators=[InputRequired()])
+    first_issues = BooleanField('Kaszel, biegunka, nudności i wymioty, zaburzenia węchu i smaku', validators=[InputRequired()])
+    second_issues = BooleanField('Trudności z oddychaniem/duszności/ trudności w nabraniu powietrza', validators=[InputRequired()])
+    third_issues = BooleanField('Bóle mięśni/zmęczenie', validators=[InputRequired()])
+
+@app.route('/covid', methods=['GET','POST'])
+@login_required
+def covid():
+    form = CovidForm()
+
+    if form.validate_on_submit():
+        new_information = Information(
+            name=form.name.data,
+            surname=form.surname.data,
+            personal_id_number=form.personal_id_number.data,
+            phone_number=form.phone_number.data,
+            temperature=form.temperature.data,
+            medicine=form.medicine.data,
+            first_issues=form.first_issues.data,
+            second_issues=form.second_issues.data,
+            third_issues=form.third_issues.data,
+        )
+        db.session.add(new_information)
+        db.session.commit()
+        flash('Dane zostały zapisane!')
+    return render_template('covid.html', form=form)
+
 
 @app.route('/')
 def home():
@@ -98,10 +137,6 @@ def signup():
 def dashboard():
     return render_template('dashboard.html', username=current_user.username, email=current_user.email)
 
-@app.route('/covid')
-@login_required
-def covid():
-    return render_template('covid.html')
 
 @app.route('/logout')
 @login_required
