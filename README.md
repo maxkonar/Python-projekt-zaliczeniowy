@@ -1,1 +1,1 @@
-Python-projekt-zaliczeniowy 
+Witam w moim projekcie zaliczeniowym z pythona.
