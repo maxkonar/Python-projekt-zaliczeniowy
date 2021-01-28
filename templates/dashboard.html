@@ -5,7 +5,7 @@ Panel użytkownika
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid">
+    <div class="container-fluid dashboard">
       <div class="row">
         <div class="col-sm-2 sidebar">
           <ul class="nav-sidebar">
@@ -24,11 +24,11 @@ Panel użytkownika
               <div class="row">
                 <div class="col">
                   <form class = 'user-info'>
-                      <label for="name">Imię: </label>
-                      <label for="surname">Nazwisko: </label>
-                      <label for="adres-email">Email: {{ email }}</label>
-                      <label for="personal-id-number">Pesel: </label>
-                      <label for="phone">Tel. kontaktowy: </label>
+                      <label for="name"><b>Imię: </b>{{ name }}</label>
+                      <label for="surname"><b>Nazwisko: </b>{{ surname }}</label>
+                      <label for="adres-email"><b>Email: </b>{{ email }}</label>
+                      <label for="personal-id-number"><b>Pesel: </b>{{ personal_id_number }}</label>
+                      <label for="phone"><b>Tel. kontaktowy: </b>{{ phone }}</label>
                   </form>
                 </div>
               </div>

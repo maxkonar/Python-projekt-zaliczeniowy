@@ -35,6 +35,11 @@
     margin-left: auto;
     margin-right: auto;
     width:75%;
+
+}
+
+.user-info{
+    text-align: center;
 }
 
 .form-covid .form-group label, .form-covid .form-group input{

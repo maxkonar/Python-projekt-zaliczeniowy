@@ -27,12 +27,11 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(80))
     informations = db.relationship('Information', backref='user')
 
-    def __init__(self, id, username, email, password, informations):
-        self.id = id
+    def __init__(self, username, email, password):
         self.username = username
         self.email = email
         self.password = password
-        self.informations = informations
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -51,12 +50,13 @@ class Information(db.Model):
     second_issues = db.Column(db.Boolean, default=False)
     third_issues = db.Column(db.Boolean, default=False)
 
-    def __init__(self, id, user_id, name, surname, personal_id_number, temperature, medicine, first_issues, second_issues, third_issues):
-        self.id = id
+    def __init__(self, user_id, name, surname, personal_id_number, phone_number, temperature, medicine, first_issues, second_issues, third_issues):
+
         self.user_id = user_id
         self.name = name
         self.surname = surname
         self.personal_id_number = personal_id_number
+        self.phone_number = phone_number
         self.temperature = temperature
         self.medicine = medicine
         self.first_issues = first_issues
@@ -89,8 +89,12 @@ class CovidForm(FlaskForm):
 def covid():
     form = CovidForm()
 
-    if request.method == "POST":
-        if form.validate_on_submit():
+    informations_exist = Information.query.filter_by(user_id = current_user.id).first()
+    if (request.method == "POST"):
+        if informations_exist:
+            flash("Wypełniałeś już formularz covidowy")
+            return redirect('dashboard')
+        else:
             new_information = Information(
                 user_id=current_user.id,
                 name=form.name.data,
@@ -105,11 +109,7 @@ def covid():
             flash('Dane zostały zapisane!')
             db.session.add(new_information)
             db.session.commit()
-            return render_template('covid.html', form=form)
-        flash('Nie przeszło validate_on_submit!')
-        return render_template('covid.html', form=form)
-    flash(current_user.username)
-    flash(form.validate())
+            return redirect('dashboard')
     return render_template('covid.html', form=form)
 
 @app.route('/')
@@ -158,6 +158,17 @@ def signup():
 @app.route('/dashboard')
 @login_required
 def dashboard():
+    if (Information.query.filter_by(user_id = current_user.id).first()):
+        user_informations = Information.query.filter_by(user_id = current_user.id).first()
+        if (current_user.id == user_informations.user.id):
+            exist_name = user_informations.name
+            exist_surname = user_informations.surname
+            exist_personal_id_number = user_informations.personal_id_number
+            exist_phone_number = user_informations.phone_number
+            return render_template('dashboard.html', username=current_user.username, email=current_user.email,
+                                   name=exist_name, surname=exist_surname, personal_id_number=exist_personal_id_number,
+                                   phone=exist_phone_number)
+
     return render_template('dashboard.html', username=current_user.username, email=current_user.email)
 
 
@@ -169,4 +180,4 @@ def logout():
 
 if __name__ == '__main__':
  db.create_all()
- app.run(debug=True)
+ app.run()
