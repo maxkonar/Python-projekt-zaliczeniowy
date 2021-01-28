@@ -27,12 +27,11 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(80))
     informations = db.relationship('Information', backref='user')
 
-    def __init__(self, id, username, email, password, informations):
-        self.id = id
+    def __init__(self, username, email, password):
         self.username = username
         self.email = email
         self.password = password
-        self.informations = informations
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -51,12 +50,12 @@ class Information(db.Model):
     second_issues = db.Column(db.Boolean, default=False)
     third_issues = db.Column(db.Boolean, default=False)
 
-    def __init__(self, id, user_id, name, surname, personal_id_number, temperature, medicine, first_issues, second_issues, third_issues):
-        self.id = id
+    def __init__(self, user_id, name, surname, personal_id_number, phone_number, temperature, medicine, first_issues, second_issues, third_issues):
         self.user_id = user_id
         self.name = name
         self.surname = surname
         self.personal_id_number = personal_id_number
+        self.phone_number = phone_number
         self.temperature = temperature
         self.medicine = medicine
         self.first_issues = first_issues
@@ -77,7 +76,7 @@ class CovidForm(FlaskForm):
     name = StringField('Imię', validators=[InputRequired(), Length(min=4, max=25)])
     surname = StringField('Nazwisko', validators=[InputRequired(), Length(min=1, max=50)])
     personal_id_number = StringField('Pesel', validators=[InputRequired(), Length(min=12, max=20)])
-    phone_number = StringField('Tel.kontaktowy', validators=[InputRequired(), Length(min=7, max=20)])
+    phone_number = StringField('Tel.kontaktowy')
     temperature = BooleanField('Gorączka 38 ˚C i powyżej')
     medicine = BooleanField('Czy zażywa Pani/Pan leki obniżające temperaturę?')
     first_issues = BooleanField('Kaszel, biegunka, nudności i wymioty, zaburzenia węchu i smaku')
@@ -90,7 +89,7 @@ def covid():
     form = CovidForm()
 
     if request.method == "POST":
-        if form.validate_on_submit():
+
             new_information = Information(
                 user_id=current_user.id,
                 name=form.name.data,
@@ -106,8 +105,7 @@ def covid():
             db.session.add(new_information)
             db.session.commit()
             return render_template('covid.html', form=form)
-        flash('Nie przeszło validate_on_submit!')
-        return render_template('covid.html', form=form)
+
     flash(current_user.username)
     flash(form.validate())
     return render_template('covid.html', form=form)
